@@ -29,6 +29,23 @@ services:
       retries: 20
     networks:
       - reverse-proxy
+
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    volumes:
+      - ./searxng_data:/etc/searxng:rw
+    environment:
+      - SEARXNG_HOSTNAME=localhost:8080/
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "1"
+    networks:
+      - reverse-proxy
+
   open-webui:
     image: ghcr.io/open-webui/open-webui:cuda
     container_name: open-webui
@@ -39,9 +56,16 @@ services:
     environment:
       - WEBUI_AUTH=True
       - OLLAMA_BASE_URL=http://ollama:11434
+      - ENABLE_WEB_SEARCH=True
+      - WEB_SEARCH_ENGINE=searxng
+      - SEARXNG_QUERY_URL=http://searxng:8080/search?q=<query>
+      - SEARXNG_LANGUAGE=all
+      - WEB_SEARCH_RESULT_COUNT=3
     depends_on:
       ollama:
         condition: service_healthy
+      searxng:
+        condition: service_started
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
       interval: 30s
