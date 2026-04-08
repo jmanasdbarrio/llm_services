@@ -1,1 +1,4 @@
+.env
 ollama_data/
+comfyui_data/
+*.mp3

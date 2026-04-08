@@ -2,6 +2,7 @@ name: llm_services
 services:
   ollama:
     image: ollama/ollama:latest
+    pull_policy: always
     container_name: ollama
     ports:
       - "11434:11434"
@@ -15,23 +16,28 @@ services:
               count: all
               capabilities: ["gpu"]
     entrypoint: >
-      sh -c "ollama serve & sleep 5 && ollama pull qwen3.5:9b && ollama pull nomic-embed-text:v1.5 && wait"
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "sh",
-          "-c",
-          "ollama list | grep qwen3.5:9b && ollama list | grep nomic-embed-text:v1.5",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 20
+      sh -c "ollama serve & sleep 5 && ollama pull qwen3.5:9b && ollama pull gemma4:e4b && ollama pull nomic-embed-text:v1.5 && wait"
+    networks:
+      - reverse-proxy
+
+  ollama-health-check:
+    image: ollama/ollama:latest
+    pull_policy: always
+    container_name: ollama-health-check
+    depends_on:
+      ollama:
+        condition: service_started
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    entrypoint: >
+      sh -c 'for i in $(seq 1 900); do ollama list | grep -q qwen3.5:9b && ollama list | grep -q gemma4:e4b && ollama list | grep -q nomic-embed-text:v1.5 && exit 0; sleep 5; done; exit 1'
+    restart: "no"
     networks:
       - reverse-proxy
 
   searxng:
     image: searxng/searxng:latest
+    pull_policy: always
     container_name: searxng
     volumes:
       - ./searxng_data:/etc/searxng:rw
@@ -43,11 +49,15 @@ services:
       options:
         max-size: "1m"
         max-file: "1"
+    depends_on:
+      ollama-health-check:
+        condition: service_completed_successfully
     networks:
       - reverse-proxy
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:cuda
+    pull_policy: always
     container_name: open-webui
     ports:
       - "8091:8080"
@@ -62,8 +72,8 @@ services:
       - SEARXNG_LANGUAGE=all
       - WEB_SEARCH_RESULT_COUNT=3
     depends_on:
-      ollama:
-        condition: service_healthy
+      ollama-health-check:
+        condition: service_completed_successfully
       searxng:
         condition: service_started
     healthcheck:
@@ -80,31 +90,54 @@ services:
             - driver: nvidia
               count: all
               capabilities: ["gpu"]
-  # comfyui:
-  #   image: yanwk/comfyui-boot:cu124-slim
-  #   container_name: comfyui
-  #   ports:
-  #     - "8188:8188"
-  #   volumes:
-  #     - ./comfyui_data/storage:/root
-  #     - ./comfyui_data/models:/root/ComfyUI/models
-  #     - ./comfyui_data/output:/root/ComfyUI/output
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - driver: nvidia
-  #             count: all
-  #             capabilities: [gpu]
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl -f http://localhost:8188/history || exit 1"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
-  #     start_period: 60s
-  #   restart: unless-stopped
-  #   networks:
-  #     - reverse-proxy
+
+  comfyui:
+    image: yanwk/comfyui-boot:cu128-slim
+    pull_policy: always
+    container_name: comfyui
+    ports:
+      - "8188:8188"
+    volumes:
+      - ./comfyui_data/models:/default-comfyui-bundle/ComfyUI/models
+      - ./comfyui_data/output:/default-comfyui-bundle/ComfyUI/output
+      - ./comfyui_data/input:/default-comfyui-bundle/ComfyUI/input
+      - ./comfyui-entrypoint.sh:/entrypoint.sh
+    environment:
+      - CLI_ARGS=--listen 0.0.0.0 --port 8188
+      - CIVITAI_API_KEY=${CIVITAI_API_KEY}
+    entrypoint: ["sh", "/entrypoint.sh"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8188/"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: ["gpu"]
+    restart: unless-stopped
+    networks:
+      - reverse-proxy
+
+  kokoro-tts:
+    image: ghcr.io/remsky/kokoro-fastapi-gpu:v0.2.2
+    pull_policy: always
+    container_name: kokoro-tts
+    ports:
+      - "8880:8880"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: ["gpu"]
+    restart: unless-stopped
+    networks:
+      - reverse-proxy
 
 volumes:
   open-webui:
