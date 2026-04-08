@@ -373,6 +373,288 @@ engines:
     engine: currency_convert
     shortcut: cc
 
+  # --- Web ---
+  - name: brave
+    engine: brave
+    shortcut: br
+    categories: [general, web]
+
+  - name: startpage
+    engine: startpage
+    shortcut: sp
+    categories: [general, web]
+
+  - name: qwant
+    engine: qwant
+    shortcut: qw
+    categories: [general, web]
+
+  - name: yahoo
+    engine: yahoo
+    shortcut: yh
+    categories: [general, web]
+
+  - name: wolframalpha
+    engine: wolframalpha_noapi
+    shortcut: wa
+    categories: [general]
+
+  - name: wikibooks
+    engine: mediawiki
+    shortcut: wb
+    base_url: "https://en.wikibooks.org/"
+    api_path: "w/api.php"
+    categories: [general, wikimedia]
+
+  - name: wikiquote
+    engine: mediawiki
+    shortcut: wq
+    base_url: "https://en.wikiquote.org/"
+    api_path: "w/api.php"
+    categories: [general, wikimedia]
+
+  - name: openlibrary
+    engine: openlibrary
+    shortcut: ol
+    categories: [general, books]
+
+  # --- Images ---
+  - name: duckduckgo images
+    engine: duckduckgo_extra
+    shortcut: ddi
+    categories: [images]
+    subcategories: [images]
+
+  - name: brave images
+    engine: brave
+    shortcut: brimg
+    categories: [images]
+    subcategories: [images]
+
+  - name: flickr
+    engine: flickr_noapi
+    shortcut: fl
+    categories: [images]
+
+  - name: unsplash
+    engine: unsplash
+    shortcut: us
+    categories: [images]
+
+  - name: openverse
+    engine: openverse
+    shortcut: opv
+    categories: [images]
+
+  - name: pixabay images
+    engine: pixabay
+    shortcut: pixi
+    categories: [images]
+    subcategories: [images]
+
+  - name: deviantart
+    engine: deviantart
+    shortcut: da
+    categories: [images]
+
+  # --- Videos ---
+  - name: youtube
+    engine: youtube_noapi
+    shortcut: yt
+    categories: [videos, music]
+
+  - name: dailymotion
+    engine: dailymotion
+    shortcut: dm
+    categories: [videos]
+
+  - name: vimeo
+    engine: vimeo
+    shortcut: vm
+    categories: [videos]
+
+  - name: peertube
+    engine: peertube
+    shortcut: ptb
+    categories: [videos]
+
+  - name: google videos
+    engine: google_videos
+    shortcut: gov
+    categories: [videos]
+
+  - name: odysee
+    engine: odysee
+    shortcut: od
+    categories: [videos]
+
+  # --- News ---
+  - name: reuters
+    engine: reuters
+    shortcut: reu
+    categories: [news]
+
+  - name: duckduckgo news
+    engine: duckduckgo_extra
+    shortcut: ddn
+    categories: [news]
+    subcategories: [news]
+
+  - name: brave news
+    engine: brave
+    shortcut: brnews
+    categories: [news]
+    subcategories: [news]
+
+  - name: qwant news
+    engine: qwant
+    shortcut: qwn
+    categories: [news]
+    subcategories: [news]
+
+  - name: wikinews
+    engine: mediawiki
+    shortcut: wn
+    base_url: "https://en.wikinews.org/"
+    api_path: "w/api.php"
+    categories: [news, wikimedia]
+
+  # --- Map ---
+  - name: openstreetmap
+    engine: openstreetmap
+    shortcut: osm
+    categories: [map]
+
+  # --- Music ---
+  - name: soundcloud
+    engine: soundcloud
+    shortcut: sc
+    categories: [music]
+
+  - name: deezer
+    engine: deezer
+    shortcut: dz
+    categories: [music]
+
+  # --- IT ---
+  - name: stackoverflow
+    engine: stackexchange
+    shortcut: st
+    categories: [it, q&a]
+
+  - name: superuser
+    engine: stackexchange
+    shortcut: su
+    categories: [it, q&a]
+
+  - name: hackernews
+    engine: hackernews
+    shortcut: hn
+    categories: [it, social media]
+
+  - name: npm
+    engine: npm
+    shortcut: npm
+    categories: [it, packages]
+
+  - name: pypi
+    engine: pypi
+    shortcut: pypi
+    categories: [it, packages]
+
+  - name: gitlab
+    engine: gitlab
+    shortcut: gl
+    categories: [it, repos]
+
+  - name: huggingface
+    engine: huggingface
+    shortcut: hf
+    categories: [it, repos]
+
+  - name: nixos wiki
+    engine: mediawiki
+    shortcut: nixw
+    base_url: "https://wiki.nixos.org/"
+    api_path: "api.php"
+    categories: [it, software wikis]
+
+  - name: microsoft learn
+    engine: microsoft_learn
+    shortcut: msl
+    categories: [it]
+
+  - name: national vulnerability database
+    engine: nvd
+    shortcut: nvd
+    categories: [it]
+
+  - name: crates.io
+    engine: crates
+    shortcut: crates
+    categories: [it, packages]
+
+  - name: pkg.go.dev
+    engine: pkg_go_dev
+    shortcut: pgo
+    categories: [it, packages]
+
+  - name: mankier
+    engine: json_engine
+    shortcut: man
+    categories: [it]
+    url: "https://www.mankier.com/api/v2/explain/?cols=500&q={query}"
+    content_query: "$.explanation"
+    title_query: "$.heading"
+    url_query: "$.url"
+    categories_as_tabs: [it]
+
+  # --- Science ---
+  - name: google scholar
+    engine: google_scholar
+    shortcut: gos
+    categories: [science, scientific publications]
+
+  - name: pubmed
+    engine: pubmed
+    shortcut: pub
+    categories: [science, scientific publications]
+
+  - name: semantic scholar
+    engine: semantic_scholar
+    shortcut: se
+    categories: [science, scientific publications]
+
+  - name: crossref
+    engine: crossref
+    shortcut: cr
+    categories: [science, scientific publications]
+    timeout: 30
+
+  - name: openalex
+    engine: openalex
+    shortcut: oa
+    categories: [science, scientific publications]
+    timeout: 5
+
+  # --- Social Media ---
+  - name: reddit
+    engine: reddit
+    shortcut: re
+    categories: [social media]
+
+  - name: mastodon users
+    engine: mastodon
+    shortcut: mau
+    categories: [social media]
+    mastodon_type: accounts
+
+  - name: mastodon hashtags
+    engine: mastodon
+    shortcut: mah
+    categories: [social media]
+    mastodon_type: hashtags
+
 doi_resolvers:
   oadoi.org: 'https://oadoi.org/'
   doi.org: 'https://doi.org/'
