@@ -8,15 +8,16 @@ services:
       - "11434:11434"
     volumes:
       - ./ollama_data:/root/.ollama
+      - ./ollama-entrypoint.sh:/entrypoint.sh
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               count: all
-              capabilities: ["gpu"]
-    entrypoint: >
-      sh -c "ollama serve & sleep 5 && ollama pull qwen3.5:9b && ollama pull gemma4:e4b && ollama pull nomic-embed-text:v1.5 && wait"
+              capabilities: [ "gpu" ]
+    entrypoint: [ "sh", "/entrypoint.sh" ]
+    restart: unless-stopped
     networks:
       - reverse-proxy
 
@@ -30,7 +31,9 @@ services:
     environment:
       - OLLAMA_HOST=http://ollama:11434
     entrypoint: >
-      sh -c 'for i in $(seq 1 900); do ollama list | grep -q qwen3.5:9b && ollama list | grep -q gemma4:e4b && ollama list | grep -q nomic-embed-text:v1.5 && exit 0; sleep 5; done; exit 1'
+      sh -c 'for i in $(seq 1 900); do ollama list | grep -q qwen3.5:9b &&
+      ollama list | grep -q gemma4:e4b && ollama list | grep -q
+      nomic-embed-text:v1.5 && exit 0; sleep 5; done; exit 1'
     restart: "no"
     networks:
       - reverse-proxy
@@ -77,7 +80,7 @@ services:
       searxng:
         condition: service_started
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080" ]
       interval: 30s
       timeout: 5s
       retries: 10
@@ -89,7 +92,7 @@ services:
           devices:
             - driver: nvidia
               count: all
-              capabilities: ["gpu"]
+              capabilities: [ "gpu" ]
 
   comfyui:
     image: yanwk/comfyui-boot:cu128-slim
@@ -105,9 +108,9 @@ services:
     environment:
       - CLI_ARGS=--listen 0.0.0.0 --port 8188
       - CIVITAI_API_KEY=${CIVITAI_API_KEY}
-    entrypoint: ["sh", "/entrypoint.sh"]
+    entrypoint: [ "sh", "/entrypoint.sh" ]
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8188/"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8188/" ]
       interval: 30s
       timeout: 10s
       retries: 20
@@ -117,7 +120,7 @@ services:
           devices:
             - driver: nvidia
               count: all
-              capabilities: ["gpu"]
+              capabilities: [ "gpu" ]
     restart: unless-stopped
     networks:
       - reverse-proxy
@@ -134,7 +137,7 @@ services:
           devices:
             - driver: nvidia
               count: all
-              capabilities: ["gpu"]
+              capabilities: [ "gpu" ]
     restart: unless-stopped
     networks:
       - reverse-proxy
