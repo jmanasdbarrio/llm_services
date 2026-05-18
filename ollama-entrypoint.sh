@@ -9,6 +9,9 @@ printf 'FROM qwen3.5:9b\nPARAMETER num_ctx 65536\n' > /tmp/mf && ollama create q
 ollama pull qwen2.5-coder:14b
 printf 'FROM qwen2.5-coder:14b\nPARAMETER num_ctx 32768\n' > /tmp/mf && ollama create qwen2.5-coder:14b -f /tmp/mf
 
+ollama pull gemma4:e4b
+printf 'FROM gemma4:e4b\nPARAMETER num_ctx 131072\n' > /tmp/mf && ollama create gemma4:e4b -f /tmp/mf
+
 ollama pull nomic-embed-text:v1.5
 
 wait
