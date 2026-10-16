@@ -116,37 +116,6 @@ services:
     networks:
       - docker-internal
 
-  comfyui:
-    image: yanwk/comfyui-boot:cu128-slim
-    pull_policy: always
-    container_name: comfyui
-    ports:
-      - "8188:8188"
-    volumes:
-      - ./comfyui_data/models:/default-comfyui-bundle/ComfyUI/models
-      - ./comfyui_data/output:/default-comfyui-bundle/ComfyUI/output
-      - ./comfyui_data/input:/default-comfyui-bundle/ComfyUI/input
-      - ./comfyui-entrypoint.sh:/entrypoint.sh
-    environment:
-      - CLI_ARGS=--listen 0.0.0.0 --port 8188
-      - CIVITAI_API_KEY=${CIVITAI_API_KEY}
-    entrypoint: ["sh", "/entrypoint.sh"]
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8188/"]
-      interval: 30s
-      timeout: 10s
-      retries: 20
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: ["gpu"]
-    restart: unless-stopped
-    networks:
-      - docker-internal
-
   kokoro-tts:
     image: ghcr.io/remsky/kokoro-fastapi-gpu:v0.2.2
     pull_policy: always
