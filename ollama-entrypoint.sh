@@ -2,6 +2,22 @@
 ollama serve &
 sleep 5
 
+materialize_manifests() {
+	manifest_dir="${OLLAMA_MODELS:-/root/.ollama/models}/manifests-v2"
+	[ -d "$manifest_dir" ] || return 0
+
+	find "$manifest_dir" -type l -exec sh -c '
+		for manifest do
+			temporary="${manifest}.tmp.$$"
+			if ! cp -L "$manifest" "$temporary"; then
+				rm -f "$temporary"
+				exit 1
+			fi
+			mv -f "$temporary" "$manifest" || exit 1
+		done
+	' sh {} +
+}
+
 ensure_model() {
 	if ! ollama list | awk 'NR > 1 {print $1}' | grep -Fqx "$1"; then
 		ollama pull "$1"
@@ -24,5 +40,7 @@ printf 'FROM gemma4:e4b\nPARAMETER num_ctx 32768\n' > /tmp/mf && ollama create g
 printf 'FROM gemma4:e4b\nPARAMETER num_ctx 16384\nPARAMETER num_thread 8\n' > /tmp/mf && ollama create gemma4:e4b-rag -f /tmp/mf
 
 ensure_model nomic-embed-text:v1.5
+
+materialize_manifests || exit 1
 
 wait
